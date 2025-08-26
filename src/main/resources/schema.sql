@@ -1,84 +1,45 @@
+-- 2. Create the 'property' table
 CREATE TABLE property
 (
-    id                UUID PRIMARY KEY,
-    owner_id          UUID        NOT NULL,
-    version           INT         NOT NULL,
-    upload_date       TIMESTAMP   NOT NULL,
-    type              VARCHAR(50),
-    title             VARCHAR(50),
-    place_id          VARCHAR(255),
-    full_address_name VARCHAR(500),
-    country           VARCHAR(100),
-    city              VARCHAR(100),
-    street            VARCHAR(255),
-    coordinates       POINT,
-    total_area        DOUBLE PRECISION CHECK (total_area > 0),
-    living_area       DOUBLE PRECISION CHECK (living_area >= 0),
-    balcony_area      DOUBLE PRECISION CHECK (balcony_area >= 0),
-    description_ka    TEXT,
-    description_en    TEXT,
-    description_ru    TEXT,
-    status            VARCHAR(50) NOT NULL
+    id                BIGSERIAL PRIMARY KEY,
+    type              text           NOT NULL,
+    listing_type      text           NOT NULL,
+    price             INTEGER        NOT NULL,
+    title             VARCHAR(500)   NOT NULL,
+    total_area        NUMERIC(10, 2) NOT NULL,
+    living_area       NUMERIC(10, 2),
+    balcony_area      NUMERIC(10, 2),
+    lat               NUMERIC(9, 6)  NOT NULL,
+    lng               NUMERIC(9, 6)  NOT NULL,
+    full_address_name TEXT           NOT NULL,
+    country           VARCHAR(100)   NOT NULL DEFAULT 'Georgia',
+    city              VARCHAR(255)   NOT NULL,
+    street            VARCHAR(500)
 );
 
-
-CREATE TABLE property_amenity
-(
-    property UUID         NOT NULL REFERENCES property (id) ON DELETE CASCADE,
-    name     VARCHAR(255) NOT NULL,
-    PRIMARY KEY (property, name)
-);
+-- Add indexes for frequently queried columns
+CREATE INDEX idx_property_type ON property (type);
+CREATE INDEX idx_property_listing_type ON property (listing_type);
+CREATE INDEX idx_property_city ON property (city);
+CREATE INDEX idx_property_price ON property (price);
 
 
-CREATE TABLE IF NOT EXISTS event_publication
-(
-    id               UUID                     NOT NULL,
-    listener_id      TEXT                     NOT NULL,
-    event_type       TEXT                     NOT NULL,
-    serialized_event TEXT                     NOT NULL,
-    publication_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    completion_date  TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (id)
-);
-CREATE INDEX IF NOT EXISTS event_publication_serialized_event_hash_idx ON event_publication USING hash (serialized_event);
-CREATE INDEX IF NOT EXISTS event_publication_by_completion_date_idx ON event_publication (completion_date);
-
-CREATE TABLE photo_gallery
-(
-    id                UUID PRIMARY KEY,
-    version           INT         NOT NULL,
-    property_id       UUID        NOT NULL UNIQUE REFERENCES property (id) ON DELETE CASCADE,
-    property_type     VARCHAR(50) NOT NULL,
-    grouped_by_spaces BOOLEAN
-);
-
+-- 3. Create the 'photo' table
+-- This table stores URLs of photos associated with a property.
 CREATE TABLE photo
 (
-    uri               VARCHAR(255) PRIMARY KEY,
-    space_id          UUID,
-    space_order       INT,
-    photo_gallery     UUID   NOT NULL REFERENCES photo_gallery (id) ON DELETE CASCADE,
-    photo_gallery_key SERIAL NOT NULL,
-    type              VARCHAR(50),
-    tags              JSONB
+    property     BIGINT NOT NULL, -- Foreign key referencing the property
+    url          TEXT   NOT NULL, -- URL of the photo
+    property_key SERIAL NOT NULL  -- If a property is deleted, its photos are also deleted
 );
 
+
+-- 4. Create the 'space' table
+-- This table stores different spaces within a property (e.g., rooms).
 CREATE TABLE space
 (
-    id             UUID PRIMARY KEY,
-    version        INT          NOT NULL DEFAULT 0,
-    property_id    UUID         NOT NULL REFERENCES property (id) ON DELETE CASCADE,
-    type           VARCHAR(255) NOT NULL,
-    name           VARCHAR(255) NOT NULL,
-    description_ka TEXT,
-    description_en TEXT,
-    description_ru TEXT,
-    area           DOUBLE PRECISION
-);
-
-CREATE TABLE space_amenity
-(
-    space UUID         NOT NULL REFERENCES space (id) ON DELETE CASCADE,
-    name  VARCHAR(255) NOT NULL,
-    PRIMARY KEY (space, name)
+    property     BIGINT        NOT NULL,
+    type         text          NOT NULL,
+    area         NUMERIC(8, 2) NOT NULL, -- Area of the specific space
+    property_key SERIAL        NOT NULL
 );

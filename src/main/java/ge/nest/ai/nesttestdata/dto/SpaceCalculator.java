@@ -1,4 +1,4 @@
-package ge.nest.ai.nesttestdata;
+package ge.nest.ai.nesttestdata.dto;
 
 import ge.nest.ai.nesttestdata.model.Space;
 import ge.nest.commons.valueobjects.spaces.SpaceType;

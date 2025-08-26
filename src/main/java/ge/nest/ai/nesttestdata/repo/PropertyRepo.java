@@ -1,4 +1,14 @@
 package ge.nest.ai.nesttestdata.repo;
 
-public interface PropertyRepo {
+import ge.nest.ai.nesttestdata.model.Property;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface PropertyRepo extends CrudRepository<Property, Long> {
+
+    List<Property> findAllBy(Pageable pageable);
 }

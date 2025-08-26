@@ -1,4 +1,4 @@
-package ge.nest.listing.web;
+package ge.nest.ai.nesttestdata.dto;
 
 import ge.nest.commons.valueobjects.listing.ListingType;
 

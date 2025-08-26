@@ -1,10 +1,8 @@
-package ge.nest.registration.usecase.web.dtos;
+package ge.nest.ai.nesttestdata.req.dtos;
 
 import ge.nest.commons.valueobjects.property.PropertyType;
-import jakarta.validation.constraints.NotNull;
 
 public record TypeDto(
-        @NotNull
         PropertyType propertyType
 ) {
 }

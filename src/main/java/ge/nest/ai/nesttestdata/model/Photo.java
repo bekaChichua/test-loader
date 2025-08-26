@@ -1,4 +1,7 @@
 package ge.nest.ai.nesttestdata.model;
 
-public class Photo {
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("photo")
+public record Photo(String url) {
 }
